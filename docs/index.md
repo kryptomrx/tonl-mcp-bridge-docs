@@ -2,9 +2,9 @@
 layout: home
 
 hero:
-  name: TONL
-  text: Token-Optimized Format
-  tagline: Reduce LLM token costs by 30-60%
+  name: TONL-MCP Bridge
+  text: Database Adapters & Tooling
+  tagline: Reduce LLM token costs by 30-60% with production-ready database integration
   actions:
     - theme: brand
       text: Get Started

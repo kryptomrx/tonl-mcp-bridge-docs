@@ -1,8 +1,8 @@
 import { defineConfig } from 'vitepress';
 
 export default defineConfig({
-  title: 'TONL',
-  description: 'Token-optimized format for LLM context windows',
+  title: 'TONL-MCP Bridge',
+  description: 'Database adapters and tooling for TONL format',
   
   themeConfig: {
     nav: [
