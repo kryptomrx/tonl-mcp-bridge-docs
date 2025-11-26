@@ -9,6 +9,7 @@ export default defineConfig({
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/core' },
       { text: 'Examples', link: '/examples/sqlite' },
+      { text: 'Roadmap', link: '/roadmap' },
       { text: 'GitHub', link: 'https://github.com/kryptomrx/tonl-mcp-bridge' }
     ],
 
@@ -33,7 +34,10 @@ export default defineConfig({
         {
           text: 'Production Features',
           items: [
+            { text: 'Claude Desktop Integration', link: '/guide/claude-desktop' },
             { text: 'MCP Server', link: '/guide/mcp-server' },
+            { text: 'Docker Deployment', link: '/guide/docker' },
+            { text: 'Production Deployment', link: '/guide/deployment' },
             { text: 'Privacy & Compliance', link: '/guide/privacy' }
           ]
         },
@@ -63,6 +67,7 @@ export default defineConfig({
             { text: 'Core Functions', link: '/api/core' },
             { text: 'SQL Adapters', link: '/api/sql' },
             { text: 'Vector Adapters', link: '/api/vector' },
+            { text: 'MCP Server', link: '/api/server' },
             { text: 'Types', link: '/api/types' }
           ]
         }
@@ -75,8 +80,8 @@ export default defineConfig({
             { text: 'PostgreSQL', link: '/examples/postgres' },
             { text: 'Batch Queries', link: '/examples/batch' },
             { text: 'RAG with Qdrant', link: '/examples/qdrant' },
-            { text: 'RAG with Milvus', link: '/examples/milvus' }
-
+            { text: 'RAG with Milvus', link: '/examples/milvus' },
+            { text: 'Claude Desktop', link: '/examples/claude-desktop' }
           ]
         }
       ]
