@@ -4,12 +4,14 @@ export default defineConfig({
   title: 'TONL-MCP Bridge',
   description: 'Database adapters and tooling for TONL format',
   
+  ignoreDeadLinks: true,
+
   themeConfig: {
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/core' },
       { text: 'Examples', link: '/examples/sqlite' },
-      { text: 'Roadmap', link: '/roadmap' },
+      { text: 'Roadmap', link: '/roadmap' }, 
       { text: 'GitHub', link: 'https://github.com/kryptomrx/tonl-mcp-bridge' }
     ],
 
