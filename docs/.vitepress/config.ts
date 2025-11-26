@@ -31,12 +31,20 @@ export default defineConfig({
           ]
         },
         {
+          text: 'Production Features',
+          items: [
+            { text: 'MCP Server', link: '/guide/mcp-server' },
+            { text: 'Privacy & Compliance', link: '/guide/privacy' }
+          ]
+        },
+        {
           text: 'Database Adapters',
           items: [
             { text: 'SQLite', link: '/guide/sqlite' },
             { text: 'PostgreSQL', link: '/guide/postgres' },
             { text: 'MySQL', link: '/guide/mysql' },
-            { text: 'Qdrant', link: '/guide/qdrant' }
+            { text: 'Qdrant', link: '/guide/qdrant' },
+            { text: 'Milvus', link: '/guide/milvus' }
           ]
         },
         {
@@ -66,7 +74,9 @@ export default defineConfig({
             { text: 'SQLite', link: '/examples/sqlite' },
             { text: 'PostgreSQL', link: '/examples/postgres' },
             { text: 'Batch Queries', link: '/examples/batch' },
-            { text: 'RAG with Qdrant', link: '/examples/qdrant' }
+            { text: 'RAG with Qdrant', link: '/examples/qdrant' },
+            { text: 'RAG with Milvus', link: '/examples/milvus' }
+
           ]
         }
       ]
