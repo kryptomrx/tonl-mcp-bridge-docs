@@ -103,7 +103,35 @@ await db.disconnect();
 
 ## CLI Usage
 
-Convert files from command line:
+### File Analysis
+
+Analyze JSON files for token savings:
+```bash
+# Basic analysis
+tonl analyze data.json
+
+# Visual dashboard
+tonl analyze data.json --visual
+
+# Different formats
+tonl analyze data.json --format json
+tonl analyze data.json --format markdown > report.md
+tonl analyze data.json --format csv
+
+# Multi-currency
+tonl analyze data.json --currency EUR
+tonl analyze data.json --currency JPY --visual
+
+# Export to CSV
+tonl analyze data.json --export results.csv
+
+# Batch analysis
+tonl analyze "data/*.json" --format csv
+```
+
+### File Conversion
+
+Convert files between formats:
 ```bash
 # Single file
 tonl convert data.json
@@ -116,6 +144,23 @@ tonl batch "data/*.json" -s
 
 # Watch mode
 tonl watch "data/*.json"
+```
+
+### ROI Calculator
+
+Calculate cost savings:
+```bash
+# From percentage
+tonl roi --savings 45 --queries-per-day 1000 --model gpt-4o
+
+# From exact tokens
+tonl roi --tokens-before 1500 --tokens-after 750 --queries-per-day 5000
+
+# JSON output
+tonl roi --savings 50 --queries-per-day 2000 --json
+
+# Marketing summary
+tonl roi --savings 60 --queries-per-day 10000 --summary
 ```
 
 ## Next Steps

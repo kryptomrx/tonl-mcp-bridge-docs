@@ -34,6 +34,19 @@ export default defineConfig({
           ]
         },
         {
+          text: 'CLI & Analytics',
+          items: [
+            { text: 'CLI Reference', link: '/guide/cli-reference' },
+            { text: 'ROI Calculator', link: '/guide/roi-calculator' },
+            { text: 'Visual Dashboard', link: '/guide/visual-dashboard' },
+            { text: 'Live MCP Monitoring', link: '/guide/live-monitoring' },
+            { text: 'Keyboard Shortcuts', link: '/guide/keyboard-shortcuts' },
+            { text: 'Responsive Layouts', link: '/guide/responsive-layouts' },
+            { text: 'Output Formats', link: '/guide/output-formats' },
+            { text: 'CI/CD Integration', link: '/guide/ci-cd-integration' }
+          ]
+        },
+        {
           text: 'Production Features',
           items: [
             { text: 'Claude Desktop Integration', link: '/guide/claude-desktop' },
@@ -48,16 +61,24 @@ export default defineConfig({
           items: [
             { text: 'SQLite', link: '/guide/sqlite' },
             { text: 'PostgreSQL', link: '/guide/postgres' },
-            { text: 'MySQL', link: '/guide/mysql' },
+            { text: 'MySQL', link: '/guide/mysql' }
+          ]
+        },
+        {
+          text: 'Vector Databases',
+          items: [
+            { text: 'MongoDB Atlas', link: '/guide/mongodb' },
+            { text: 'Pinecone', link: '/guide/pinecone' },
+            { text: 'Weaviate', link: '/guide/weaviate' },
             { text: 'Qdrant', link: '/guide/qdrant' },
             { text: 'Milvus', link: '/guide/milvus' }
           ]
         },
         {
-          text: 'Advanced',
+          text: 'Advanced Tools',
           items: [
-            { text: 'Batch Operations', link: '/guide/batch' },
             { text: 'Query Analyzer', link: '/guide/query-analyzer' },
+            { text: 'Batch Operations', link: '/guide/batch' },
             { text: 'Schema Drift', link: '/guide/schema-drift' }
           ]
         }
