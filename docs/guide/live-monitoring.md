@@ -1,337 +1,563 @@
-# Live MCP Monitoring
+# Live Monitoring with `tonl top`
 
-Real-time monitoring of your TONL MCP Server status directly in the Visual Dashboard.
+Real-time server monitoring dashboard for TONL MCP Server. Like `htop` but for your TONL infrastructure.
 
 ## Overview
 
-The Live MCP Monitoring feature (v1.0.0) provides real-time status updates about your TONL MCP Server connection. The monitor checks server health every 5 seconds and displays connection status, response time, and latency directly in the dashboard.
+The `tonl top` command provides a live, terminal-based dashboard that displays real-time metrics from your TONL MCP Server. Monitor CPU, memory, conversions, token savings, and business impact in a single view.
 
-## Features
-
-**Real-time Status**
-- Live connection indicator (🟢 Online / 🔴 Offline / 🟡 Connecting)
-- Response time measurement in milliseconds
-- Automatic health checks every 5 seconds
-- Non-blocking background updates
-
-**Visual Indicators**
-- Color-coded status (green/red/yellow)
-- Response time in ms
-- Last check timestamp
-- Clean, minimal design
-
-## How It Works
-
-The monitor performs background health checks using the `/metrics` endpoint:
-
-```typescript
-fetch('http://localhost:3000/metrics')
-  .then(response => {
-    if (response.ok) {
-      status = 'online';
-      latency = Date.now() - startTime;
-    }
-  })
-```
-
-Updates happen every 5 seconds without blocking the UI.
-
-## Usage
-
-The MCP status appears automatically in the Visual Dashboard:
-
-```bash
-tonl analyze data.json --visual
-```
-
-**Dashboard Header:**
-```
-  ╔╦╗ ╔═╗ ╔╗╔ ╦  
-   ║  ║ ║ ║║║ ║  
-   ╩  ╚═╝ ╝╚╝ ╩═╝
- ROI Analyzer                   MCP: 🟢 Online (45ms)    v1.0.0
-```
-
-## Status Indicators
-
-### Online (🟢)
-Server is responding to health checks:
-```
-MCP: 🟢 Online (45ms)
-```
-- Green indicator
-- Response time displayed
-- Server is operational
-
-### Offline (🔴)
-Server is not responding:
-```
-MCP: 🔴 Offline
-```
-- Red indicator
-- No response time
-- Check server status
-
-### Connecting (🟡)
-Initial health check in progress:
-```
-MCP: 🟡 Connecting...
-```
-- Yellow indicator
-- First check pending
-- Normal on dashboard start
-
-## Server Configuration
-
-### Default Server
-The monitor checks `http://localhost:3000` by default.
-
-### Custom Server
-Set environment variable for custom server URL:
-
-```bash
-export TONL_MCP_URL=http://production-server:3000
-tonl analyze data.json --visual
-```
-
-### Server Requirements
-
-The MCP server must expose the `/metrics` endpoint:
+## Quick Start
 
 ```bash
 # Start server
+export TONL_AUTH_TOKEN=your-token
 npm run mcp:start
 
-# Verify endpoint
-curl http://localhost:3000/metrics
+# In another terminal
+tonl top
 ```
 
-## Latency Thresholds
+![Dashboard showing CPU 3.3%, RAM 32.9 MB, 156 conversions, 38k tokens saved]
 
-Response time interpretation:
+## Features
 
-| Latency | Status | Description |
-|---------|--------|-------------|
-| 0-50ms | Excellent | Local server, optimal |
-| 50-100ms | Good | Same network |
-| 100-200ms | Fair | Remote server |
-| 200ms+ | Slow | Network issues |
-| N/A | Offline | Server down |
+### System Resources
+- **CPU Usage**: Real-time percentage with color-coded bars
+- **Memory**: Heap usage with total allocation
+- **Event Loop Lag**: Monitor for performance issues
+- **Health Status**: 🟢 Online / 🔴 Degraded
+
+### Live Activity
+- **Active Streams**: Current SSE connections
+- **Conversions**: Total, successful, and failed counts
+- **Error Tracking**: By type (auth, validation, internal, stream)
+
+### Business Impact
+- **Tokens Saved**: Cumulative token savings
+- **Cost Saved**: Estimated cost savings in USD
+- **Avg Compression**: Average compression ratio across all operations
+
+## Installation
+
+```bash
+npm install -g tonl-mcp-bridge
+```
+
+## Basic Usage
+
+### Monitor Local Server
+
+```bash
+tonl top
+```
+
+Connects to `http://localhost:3000/metrics` by default.
+
+### Monitor Remote Server
+
+```bash
+tonl top --url https://production.company.com/metrics
+```
+
+### With Authentication
+
+```bash
+# Via environment variable
+export TONL_AUTH_TOKEN=your-secure-token
+tonl top
+
+# Via command line
+tonl top --token your-secure-token
+```
+
+### Custom Refresh Rate
+
+```bash
+# Update every 2 seconds (default: 1s)
+tonl top --interval 2000
+```
+
+## Command Options
+
+```bash
+tonl top [options]
+
+Options:
+  -u, --url <url>        Server metrics URL (default: http://localhost:3000/metrics)
+  -i, --interval <ms>    Refresh interval in milliseconds (default: 1000)
+  -t, --token <token>    Auth token (or use TONL_AUTH_TOKEN env var)
+  --no-stream            Disable SSE streaming (use polling instead)
+  -h, --help             Display help
+```
+
+## Dashboard Sections
+
+### Header
+
+```
+TONL SERVER MONITOR  🟢 ONLINE  v1.0.0  •  http://localhost:3000/metrics  •  Uptime: 0h 12m
+```
+
+- Status indicator (🟢/🔴)
+- Server version
+- Server URL
+- Uptime
+
+### Resources
+
+```
+Resources:
+CPU   [████░░░░░░░░░░░░░░░░]  3.3%
+RAM   [████████░░░░░░░░░░░░]  32.9 MB / 57.7 MB
+Lag   [2.1ms]  Healthy
+```
+
+**CPU Bar Colors:**
+- Green: 0-50%
+- Yellow: 50-80%
+- Red: 80%+
+
+**Memory Bar:**
+- Shows heap used / heap total
+- Percentage-based visualization
+
+**Event Loop Lag:**
+- Healthy: <100ms
+- Slow: ≥100ms
+
+### Live Activity
+
+```
+Live Activity:
+👥 Active Streams:    1
+⚡ Conversions:       156 total (156 ✓, 0 ✗)
+🔥 Errors (total):    0
+```
+
+**Counters:**
+- Active Streams: Current SSE connections
+- Conversions: Success/failure breakdown
+- Errors: Detailed by type when > 0
+
+### Business Impact
+
+```
+Business Impact:
+💰 Tokens Saved:      38,168
+💵 Cost Saved:        $0.0954
+📉 Avg Compression:   64.9%
+```
+
+**Metrics:**
+- Tokens Saved: Cumulative since server start
+- Cost Saved: Based on GPT-4o pricing ($2.50/1M tokens)
+- Compression: Average ratio (lower = better compression)
+
+## Live Streaming Mode
+
+By default, `tonl top` uses SSE (Server-Sent Events) for real-time updates:
+
+```bash
+tonl top  # SSE streaming (recommended)
+```
+
+**Benefits:**
+- Real-time updates (push-based)
+- Lower latency
+- More efficient than polling
+- Works great over networks
+
+### Polling Mode
+
+Fallback to HTTP polling if SSE is unavailable:
+
+```bash
+tonl top --no-stream
+```
+
+Uses periodic HTTP requests instead of persistent connection.
+
+## Authentication
+
+### Development (No Auth)
+
+```bash
+# Server without token
+npm run mcp:start
+
+# Dashboard without token
+tonl top
+```
+
+Server auto-generates session tokens.
+
+### Production (With Auth)
+
+```bash
+# Server with token
+export TONL_AUTH_TOKEN=your-secure-token
+npm run mcp:start
+
+# Dashboard with token
+export TONL_AUTH_TOKEN=your-secure-token
+tonl top
+```
+
+Or use CLI flag:
+
+```bash
+tonl top --token your-secure-token
+```
+
+## Configuration
+
+### Environment Variables
+
+```bash
+# Server URL (if not default)
+export TONL_SERVER_URL=https://production.company.com/metrics
+
+# Auth token
+export TONL_AUTH_TOKEN=your-secure-token
+
+# Then simply
+tonl top
+```
+
+### Rate Limiting
+
+Server-side rate limiting is configurable:
+
+```bash
+# Disable rate limiting (development)
+export TONL_RATE_LIMIT_ENABLED=false
+npm run mcp:start
+
+# Configure limits (production)
+export TONL_RATE_LIMIT_ENABLED=true
+export TONL_RATE_LIMIT_WINDOW_MS=900000  # 15 minutes
+export TONL_RATE_LIMIT_MAX=100           # 100 requests
+npm run mcp:start
+```
+
+**Note:** Rate limiting applies to `/stream/convert`, not `/metrics/live`.
 
 ## Use Cases
 
-### Development
-Monitor server status during local development:
+### 1. Development Monitoring
+
+Monitor server during local development:
 
 ```bash
-# Terminal 1: Start server
+# Terminal 1: Server
 npm run mcp:start
 
-# Terminal 2: Watch status
-tonl analyze data.json --visual
+# Terminal 2: Dashboard
+tonl top
+
+# Terminal 3: Load testing
+node load-test.js
 ```
 
-Visual feedback confirms server is running.
+Watch metrics update in real-time as you test.
 
-### Production Monitoring
-Check production server health:
+### 2. Production Monitoring
+
+Monitor remote production server:
 
 ```bash
-TONL_MCP_URL=https://tonl.company.com tonl analyze data.json --visual
+tonl top --url https://tonl-prod.company.com/metrics --token $PROD_TOKEN
 ```
 
-Quick verification of remote server status.
+Keep dashboard open in dedicated terminal or tmux pane.
 
-### Troubleshooting
-Diagnose connectivity issues:
+### 3. Performance Testing
+
+Monitor server under load:
 
 ```bash
-# Check if server is responding
-tonl analyze data.json --visual
+# Terminal 1: Server
+npm run mcp:start
 
-# If offline, verify server
-curl http://localhost:3000/metrics
+# Terminal 2: Dashboard
+tonl top
+
+# Terminal 3: Load test
+for i in {1..1000}; do
+  curl -X POST http://localhost:3000/stream/convert \
+    -H "Content-Type: application/x-ndjson" \
+    --data-binary @test.ndjson
+done
 ```
 
-Real-time feedback helps identify problems quickly.
+Watch CPU, memory, and event loop lag.
 
-### Presentations
-Show live system status during demos:
+### 4. Troubleshooting
+
+Debug server issues:
 
 ```bash
-tonl analyze demo-data.json --visual
+tonl top
 ```
 
-Live status indicator builds confidence in system reliability.
+**Check for:**
+- High CPU (>80%)
+- Memory leaks (increasing heap)
+- Event loop lag (>100ms)
+- Error spikes
+- Failed conversions
 
-## Integration with Metrics
+### 5. Team Collaboration
 
-The live monitor uses the same Prometheus metrics endpoint:
+Share server status with team:
 
 ```bash
-# Metrics endpoint
-GET http://localhost:3000/metrics
-
-# Returns Prometheus format
-tonl_conversion_requests_total{...} 42
-tonl_tokens_saved_total{...} 15000
-...
+# In tmux or screen session
+tonl top --url https://shared-server.company.com/metrics
 ```
 
-Successful health check confirms:
-- Server is running
-- Metrics are being collected
-- API is accessible
+Team members can view same dashboard.
 
-## Performance
+## Metrics Explained
 
-**Efficient Polling**
-- 5-second interval (not aggressive)
-- Async updates (non-blocking)
-- Minimal network overhead (~1KB per check)
+### CPU Percentage
 
-**Resource Usage**
-- Negligible CPU impact
-- Small memory footprint
-- No UI blocking
+Calculated from Prometheus counters:
+
+```
+CPU% = (cpu_delta / time_delta) * 100
+```
+
+Requires 2+ snapshots for calculation (shows 0% initially).
+
+### Memory Percentage
+
+```
+Memory% = (heap_used / heap_total) * 100
+```
+
+Available immediately from first snapshot.
+
+### Event Loop Lag
+
+Measured in milliseconds:
+
+- **0-10ms**: Excellent
+- **10-50ms**: Good
+- **50-100ms**: Fair (warning)
+- **100ms+**: Poor (server is struggling)
+
+### Compression Ratio
+
+```
+Compression% = (1 - tonl_bytes / json_bytes) * 100
+```
+
+Higher percentage = better compression.
 
 ## Troubleshooting
 
-### Status Always Offline
+### Dashboard Shows DEGRADED
 
-**Check server is running:**
+**Possible causes:**
+- High CPU usage (>80%)
+- Event loop lag (>100ms)
+- Memory pressure
+
+**Solutions:**
+1. Check server logs for errors
+2. Reduce concurrent requests
+3. Scale horizontally (more replicas)
+4. Optimize payload sizes
+
+### Connection Failed (401/403)
+
+**Issue:** Authentication error
+
+**Solutions:**
 ```bash
-ps aux | grep node
+# Check token is set
+echo $TONL_AUTH_TOKEN
+
+# Use correct token
+export TONL_AUTH_TOKEN=correct-token-here
+tonl top
 ```
 
-**Verify metrics endpoint:**
-```bash
-curl http://localhost:3000/metrics
-```
+### No Data / Stuck on Loading
 
-**Check firewall:**
-```bash
-# macOS
-sudo pfctl -s rules | grep 3000
+**Issue:** Server not responding
 
-# Linux
-sudo iptables -L | grep 3000
-```
+**Solutions:**
+1. Check server is running: `ps aux | grep node`
+2. Verify endpoint: `curl http://localhost:3000/metrics`
+3. Check firewall settings
+4. Try polling mode: `tonl top --no-stream`
 
-### High Latency
+### Metrics Not Updating
 
-**Check network:**
-```bash
-ping localhost
-```
+**Issue:** SSE stream disconnected
 
-**Verify server load:**
-```bash
-curl http://localhost:3000/metrics | grep process_cpu
-```
+**Solutions:**
+1. Check network stability
+2. Restart dashboard: `Ctrl+C` then `tonl top`
+3. Use polling mode: `tonl top --no-stream`
 
-**Check system resources:**
-```bash
-top -p $(pgrep node)
-```
+### High Error Count
 
-### Status Stuck on Connecting
+**Issue:** Server reporting errors
 
-**Check network connectivity:**
-```bash
-curl -I http://localhost:3000/metrics
-```
+**Check error types:**
+- **Auth**: Wrong tokens
+- **Validation**: Bad input data
+- **Internal**: Server bugs
+- **Stream**: Streaming failures
 
-**Verify URL configuration:**
-```bash
-echo $TONL_MCP_URL
-```
-
-**Check server logs:**
+View server logs for details:
 ```bash
 npm run mcp:start 2>&1 | tee server.log
 ```
 
+## Performance
+
+### Dashboard Overhead
+
+- **CPU**: <1% typical
+- **Memory**: ~50MB
+- **Network**: ~1KB/second (SSE mode)
+
+### Update Frequency
+
+Default 1-second updates provide:
+- Real-time feel
+- Reasonable network usage
+- Low server impact
+
+Adjust for your needs:
+```bash
+tonl top --interval 5000  # Every 5 seconds
+```
+
+## Keyboard Shortcuts
+
+- **Ctrl+C**: Exit dashboard
+- **q**: Quit (if implemented)
+
+## Integration
+
+### With Prometheus
+
+The dashboard reads Prometheus metrics exposed by the server:
+
+```bash
+# View raw metrics
+curl http://localhost:3000/metrics
+```
+
+**Key metrics used:**
+- `tonl_process_cpu_*`: CPU usage
+- `tonl_nodejs_heap_size_*`: Memory
+- `tonl_nodejs_eventloop_lag_*`: Event loop
+- `tonl_tokens_saved_total`: Token savings
+- `tonl_conversion_requests_total`: Conversions
+- `tonl_errors_total`: Errors
+
+### With Grafana
+
+For advanced monitoring, import metrics to Grafana:
+
+```yaml
+# prometheus.yml
+scrape_configs:
+  - job_name: 'tonl'
+    static_configs:
+      - targets: ['localhost:3000']
+    metrics_path: '/metrics'
+```
+
+Use `tonl top` for quick checks, Grafana for dashboards.
+
 ## Best Practices
 
-**Always Check Status**
+**Always Monitor Under Load**
 
-Before analysis, verify server is online:
+Don't just check when things are working:
 ```bash
-tonl analyze data.json --visual
-# Check MCP indicator before proceeding
+# Start monitoring BEFORE load testing
+tonl top
+# Then run load tests in another terminal
 ```
 
-**Monitor During Long Sessions**
+**Set Up Alerts**
 
-For extended analysis sessions, watch for status changes:
-- Server restarts
-- Network interruptions
-- Resource exhaustion
+For production, monitor continuously:
+- Use Grafana alerts for CPU/memory thresholds
+- Use `tonl top` for manual checks
 
-**Use in CI/CD**
+**Keep Token Secure**
 
-Skip visual dashboard in automated environments:
+Never commit auth tokens:
 ```bash
-# CI/CD - use JSON output
-tonl analyze data.json --format json
+# .env
+TONL_AUTH_TOKEN=secret-token
 
-# Local development - use visual
-tonl analyze data.json --visual
+# Use env file
+source .env
+tonl top
 ```
 
-## Technical Details
+**Monitor Multiple Servers**
 
-### Health Check Logic
+Use tmux/screen for multiple dashboards:
+```bash
+# Window 1: Production
+tonl top --url https://prod.company.com/metrics
 
-```typescript
-async function checkHealth() {
-  const startTime = Date.now();
-  
-  try {
-    const response = await fetch(serverUrl + '/metrics');
-    
-    if (response.ok) {
-      return {
-        status: 'online',
-        latency: Date.now() - startTime
-      };
-    }
-  } catch (error) {
-    return { status: 'offline' };
-  }
-}
+# Window 2: Staging
+tonl top --url https://staging.company.com/metrics
+
+# Window 3: Development
+tonl top
 ```
 
-### Update Interval
+## Examples
 
-5-second interval chosen for:
-- Balance between freshness and overhead
-- Reasonable for manual monitoring
-- Not aggressive for production servers
+### Basic Local Monitoring
 
-### Timeout Handling
+```bash
+# Terminal 1
+npm run mcp:start
 
-Health checks timeout after 3 seconds:
-```typescript
-const controller = new AbortController();
-setTimeout(() => controller.abort(), 3000);
-
-fetch(url, { signal: controller.signal });
+# Terminal 2
+tonl top
 ```
 
-## Future Enhancements
+### Production Monitoring with Auth
 
-Planned improvements:
-- Configurable check interval
-- Detailed error messages
-- Historical latency graph
-- Multiple server monitoring
-- Alert notifications
+```bash
+export TONL_AUTH_TOKEN=$(vault read -field=token secret/tonl)
+tonl top --url https://tonl-prod.company.com/metrics
+```
+
+### Custom Refresh Rate
+
+```bash
+# Every 500ms (high frequency)
+tonl top --interval 500
+
+# Every 5s (low frequency)
+tonl top --interval 5000
+```
+
+### Polling Mode (No SSE)
+
+```bash
+tonl top --no-stream --interval 2000
+```
 
 ## See Also
 
-- [Visual Dashboard](/guide/visual-dashboard) - Dashboard overview
-- [MCP Server](/guide/mcp-server) - Server setup
-- [Metrics](/guide/metrics) - Prometheus metrics
+- [MCP Server Guide](/guide/mcp-server) - Server setup
+- [Metrics Reference](/api/metrics) - All available metrics
 - [Deployment](/guide/deployment) - Production deployment
+- [Troubleshooting](/guide/troubleshooting) - Common issues

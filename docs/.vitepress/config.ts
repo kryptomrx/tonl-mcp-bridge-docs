@@ -10,6 +10,7 @@ export default defineConfig({
     nav: [
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API', link: '/api/core' },
+      { text: 'Reference', link: '/reference/environment-variables' },
       { text: 'Examples', link: '/examples/sqlite' },
       { text: 'Roadmap', link: '/roadmap' }, 
       { text: 'GitHub', link: 'https://github.com/kryptomrx/tonl-mcp-bridge' }
@@ -105,6 +106,14 @@ export default defineConfig({
             { text: 'Vector Adapters', link: '/api/vector' },
             { text: 'MCP Server', link: '/api/server' },
             { text: 'Types', link: '/api/types' }
+          ]
+        }
+      ],
+      '/reference/': [
+        {
+          text: 'Reference',
+          items: [
+            { text: 'Environment Variables', link: '/reference/environment-variables' }
           ]
         }
       ],
