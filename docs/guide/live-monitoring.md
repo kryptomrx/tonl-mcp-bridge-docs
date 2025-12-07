@@ -23,7 +23,8 @@ tonl top
 
 ### System Resources
 - **CPU Usage**: Real-time percentage with color-coded bars
-- **Memory**: Heap usage with total allocation
+- **Memory (RSS)**: Actual process memory usage vs container limit (default 512MB)
+- **Heap Usage**: Node.js heap percentage (shown as additional info)
 - **Event Loop Lag**: Monitor for performance issues
 - **Health Status**: 🟢 Online / 🔴 Degraded
 
@@ -108,7 +109,7 @@ TONL SERVER MONITOR  🟢 ONLINE  v1.0.0  •  http://localhost:3000/metrics  �
 ```
 Resources:
 CPU   [████░░░░░░░░░░░░░░░░]  3.3%
-RAM   [████████░░░░░░░░░░░░]  32.9 MB / 57.7 MB
+RAM   [███░░░░░░░░░░░░░░░░░]  93.0 MB  (Heap: 67%)
 Lag   [2.1ms]  Healthy
 ```
 
@@ -118,8 +119,16 @@ Lag   [2.1ms]  Healthy
 - Red: 80%+
 
 **Memory Bar:**
-- Shows heap used / heap total
-- Percentage-based visualization
+- Shows RSS (Resident Set Size) - actual process memory
+- Bar represents percentage of typical container limit (512MB)
+- Heap percentage shown as additional context
+- **Why RSS?** More accurate for operations/K8s resource planning
+- **Heap %** high (80-95%) is normal - Node.js triggers GC automatically
+
+**Memory Colors:**
+- Green: 0-50% of 512MB (0-256MB)
+- Yellow: 50-80% (256-410MB)
+- Red: 80%+ (410MB+)
 
 **Event Loop Lag:**
 - Healthy: <100ms
@@ -332,11 +341,33 @@ Requires 2+ snapshots for calculation (shows 0% initially).
 
 ### Memory Percentage
 
+**RSS (Resident Set Size):**
 ```
-Memory% = (heap_used / heap_total) * 100
+RSS = Actual process memory footprint
+Bar% = (RSS / 512MB limit) * 100
 ```
 
-Available immediately from first snapshot.
+**Why we show RSS instead of Heap:**
+- RSS is what Kubernetes/Docker sees
+- RSS is what counts against container limits
+- RSS is stable and predictable
+- Heap % can be 90%+ and still healthy (GC triggers automatically)
+
+**Heap Percentage (shown for context):**
+```
+Heap% = (heap_used / heap_total) * 100
+```
+- High heap % (80-95%) is **NORMAL** and **HEALTHY**
+- Node.js V8 engine triggers GC when needed
+- Focus on RSS for operational decisions
+
+**Example:**
+```
+RAM [███░░░░░░░] 93.0 MB (Heap: 95%)
+     ^^^                    ^^^
+     RSS: 18% of 512MB      Heap almost full - GC will run soon
+     Green bar = healthy    This is normal!
+```
 
 ### Event Loop Lag
 
@@ -362,13 +393,16 @@ Higher percentage = better compression.
 **Possible causes:**
 - High CPU usage (>80%)
 - Event loop lag (>100ms)
-- Memory pressure
+- High RSS (>400MB for 512MB limit)
+
+**Note:** High Heap % alone does NOT cause DEGRADED status - this is normal!
 
 **Solutions:**
 1. Check server logs for errors
 2. Reduce concurrent requests
 3. Scale horizontally (more replicas)
 4. Optimize payload sizes
+5. Check if RSS is growing continuously (memory leak)
 
 ### Connection Failed (401/403)
 
