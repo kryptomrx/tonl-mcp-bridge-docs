@@ -1,262 +1,460 @@
-# Claude Desktop Quick Start
+# Claude Desktop Integration
 
-Quick example: Connect TONL-MCP Bridge to Claude Desktop in 5 minutes.
+Connect TONL-MCP Bridge to Claude Desktop for automatic JSON ↔ TONL conversion with 40-60% token savings.
 
-## Prerequisites
+## Quick Start (2 Minutes)
 
-- Claude Desktop installed
-- Node.js 18+ installed
-
-## Step 1: Install (1 minute)
+### Step 1: Install
 
 ```bash
 npm install -g tonl-mcp-bridge
 ```
 
-## Step 2: Generate Token (30 seconds)
+### Step 2: Configure Claude Desktop
 
+**macOS:**
 ```bash
-# Generate secure token
-openssl rand -base64 32
-
-# Save output, e.g.:
-# kJ8mN2pQ4rS6tU8vW0xY2zA4bC6dE8fG0hI2jK4lM6n=
-```
-
-## Step 3: Start Server (30 seconds)
-
-```bash
-export TONL_AUTH_TOKEN=kJ8mN2pQ4rS6tU8vW0xY2zA4bC6dE8fG0hI2jK4lM6n=
-npx tonl-mcp-server
-```
-
-Expected output:
-```
-🚀 TONL MCP Server listening on port 3000
-   - SSE Stream: http://localhost:3000/mcp
-   🔒 Security: Enabled (Bearer Token required)
-💡 Press Ctrl+C to stop the server gracefully
-```
-
-**Keep this terminal open!**
-
-## Step 4: Configure Claude Desktop (2 minutes)
-
-### macOS
-
-```bash
-# Edit config
 code ~/Library/Application\ Support/Claude/claude_desktop_config.json
 ```
 
-### Windows
-
+**Windows:**
 ```bash
-# Edit config
 notepad %APPDATA%\Claude\claude_desktop_config.json
 ```
 
-### Add Configuration
+**Add this configuration:**
 
 ```json
 {
   "mcpServers": {
     "tonl": {
-      "url": "http://localhost:3000/mcp",
-      "transport": {
-        "type": "sse"
-      },
-      "headers": {
-        "Authorization": "Bearer kJ8mN2pQ4rS6tU8vW0xY2zA4bC6dE8fG0hI2jK4lM6n="
+      "command": "npx",
+      "args": ["-y", "tonl-mcp-stdio"]
+    }
+  }
+}
+```
+
+### Step 3: Restart Claude Desktop
+
+1. Completely quit Claude Desktop
+2. Restart
+3. Look for MCP icon (🔌) in bottom-right corner
+
+### Step 4: Test
+
+Ask Claude:
+
+> "Convert this JSON to TONL: [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]"
+
+**Expected response:**
+```tonl
+users[2]{id:i32,name:str}:
+  1, Alice
+  2, Bob
+
+Token savings: 36%
+```
+
+✅ **Done! TONL is now integrated with Claude Desktop.**
+
+---
+
+## Development Setup (Local Build)
+
+If you're developing TONL locally:
+
+```json
+{
+  "mcpServers": {
+    "tonl": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/tonl-mcp-bridge/dist/mcp/stdio.js"
+      ]
+    }
+  }
+}
+```
+
+**Example (macOS/Linux):**
+```json
+{
+  "mcpServers": {
+    "tonl": {
+      "command": "node",
+      "args": [
+        "/Users/yourname/projects/tonl-mcp-bridge/dist/mcp/stdio.js"
+      ]
+    }
+  }
+}
+```
+
+**Example (Windows):**
+```json
+{
+  "mcpServers": {
+    "tonl": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\YourName\\projects\\tonl-mcp-bridge\\dist\\mcp\\stdio.js"
+      ]
+    }
+  }
+}
+```
+
+**Build first:**
+```bash
+cd /path/to/tonl-mcp-bridge
+npm run build
+```
+
+---
+
+## What You Can Do
+
+### 1. Convert JSON to TONL
+
+**Ask Claude:**
+> Convert this to TONL: [{"product": "Laptop", "price": 999}, {"product": "Mouse", "price": 25}]
+
+**Claude responds:**
+```tonl
+products[2]{product:str,price:i32}:
+  Laptop, 999
+  Mouse, 25
+
+Saved 42% tokens
+```
+
+### 2. Parse TONL to JSON
+
+**Ask Claude:**
+> Parse this TONL: users[2]{id:i32,name:str}: 1,Alice 2,Bob
+
+**Claude responds:**
+```json
+[
+  {"id": 1, "name": "Alice"},
+  {"id": 2, "name": "Bob"}
+]
+```
+
+### 3. Calculate Savings
+
+**Ask Claude:**
+> Calculate token savings for this data: [{"id": 1, "name": "Test"}]
+
+**Claude responds:**
+```
+Original (JSON): 38 tokens
+TONL format: 25 tokens
+Savings: 13 tokens (34%)
+```
+
+---
+
+## Common Use Cases
+
+### RAG Database Results
+
+```
+I have these search results from my vector database:
+
+[
+  {"id": 1, "content": "How to deploy Kubernetes", "score": 0.95},
+  {"id": 2, "content": "Docker best practices", "score": 0.89}
+]
+
+Convert to TONL to save tokens before sending to GPT-4.
+```
+
+### API Response Optimization
+
+```
+This API returned 100 user records. Convert to TONL to reduce 
+token costs when analyzing with LLM:
+
+[{"user_id": 1, "name": "Alice", "status": "active"}, ...]
+```
+
+### Log Analysis
+
+```
+Convert these application logs to TONL for efficient LLM analysis:
+
+[
+  {"timestamp": "2024-12-07T10:00:00Z", "level": "error", "message": "Connection timeout"},
+  {"timestamp": "2024-12-07T10:01:00Z", "level": "warn", "message": "Retry attempt 1"}
+]
+```
+
+---
+
+## Troubleshooting
+
+### Tools Not Showing Up
+
+**Check MCP Status:**
+1. Look for 🔌 icon in Claude Desktop (bottom-right)
+2. Click icon to see connected servers
+3. "tonl" should be listed
+
+**If not listed:**
+1. Verify config file syntax (valid JSON)
+2. Check absolute paths (no ~, use full path)
+3. Restart Claude Desktop completely (Quit, not just close)
+
+### "Command not found" Error
+
+**Global install:**
+```bash
+# Check if installed
+which tonl-mcp-stdio
+
+# If not found, reinstall
+npm install -g tonl-mcp-bridge
+```
+
+**Local development:**
+```bash
+# Check file exists
+ls /path/to/tonl-mcp-bridge/dist/mcp/stdio.js
+
+# If not, rebuild
+cd /path/to/tonl-mcp-bridge
+npm run build
+```
+
+### "TONL Server Error"
+
+**Check logs:**
+
+**macOS:**
+```bash
+tail -f ~/Library/Logs/Claude/mcp*.log
+```
+
+**Windows:**
+```bash
+type %APPDATA%\Claude\logs\mcp*.log
+```
+
+### Configuration Not Loading
+
+**Validate JSON:**
+```bash
+# macOS/Linux
+cat ~/Library/Application\ Support/Claude/claude_desktop_config.json | jq .
+
+# Should show formatted JSON, or error if invalid
+```
+
+**Common mistakes:**
+- Missing commas between objects
+- Trailing commas (not allowed in JSON)
+- Wrong quotes (use " not ')
+- Incorrect path separators (Windows: \\, Unix: /)
+
+---
+
+## Multiple MCP Servers
+
+You can run TONL alongside other MCP servers:
+
+```json
+{
+  "mcpServers": {
+    "tonl": {
+      "command": "npx",
+      "args": ["-y", "tonl-mcp-stdio"]
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/Users/yourname/Documents"
+      ]
+    },
+    "postgres": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-postgres",
+        "postgresql://localhost/mydb"
+      ]
+    }
+  }
+}
+```
+
+---
+
+## Advanced Configuration
+
+### Environment Variables
+
+Pass environment variables to the MCP server:
+
+```json
+{
+  "mcpServers": {
+    "tonl": {
+      "command": "node",
+      "args": [
+        "/path/to/tonl-mcp-bridge/dist/mcp/stdio.js"
+      ],
+      "env": {
+        "DEBUG": "tonl:*",
+        "NODE_ENV": "development"
       }
     }
   }
 }
 ```
 
-**Replace token with your generated token!**
+### Using npm Scripts
 
-## Step 5: Restart Claude Desktop (1 minute)
-
-1. Completely quit Claude Desktop
-2. Wait 5 seconds
-3. Restart Claude Desktop
-4. Check MCP icon appears (bottom-right)
-
-## Step 6: Test (1 minute)
-
-Ask Claude:
-
-> "Can you convert this JSON to TONL format: [{"id": 1, "name": "Alice", "age": 25}, {"id": 2, "name": "Bob", "age": 30}]"
-
-Expected response:
-```
-users[2]{id:i32,name:str,age:i32}:
-  1, Alice, 25
-  2, Bob, 30
-
-Token savings: 36.4%
+```json
+{
+  "mcpServers": {
+    "tonl": {
+      "command": "npm",
+      "args": [
+        "exec",
+        "-c",
+        "tonl-mcp-stdio"
+      ],
+      "cwd": "/path/to/tonl-mcp-bridge"
+    }
+  }
+}
 ```
 
-## What You Can Do
+---
 
-### Convert to TONL
+## Performance
 
-```
-Convert this data to TONL:
-[
-  {"product": "Laptop", "price": 999, "stock": 50},
-  {"product": "Mouse", "price": 25, "stock": 200}
-]
-```
+- **Startup time:** <1 second
+- **Conversion speed:** <10ms for typical datasets
+- **Memory usage:** ~50MB
+- **No network latency:** Direct stdio communication
 
-### Parse from TONL
+---
 
-```
-Parse this TONL to JSON:
-products[2]{product:str,price:i32,stock:i32}:
-  Laptop, 999, 50
-  Mouse, 25, 200
-```
+## Security
 
-### Calculate Savings
+### Local Only
 
-```
-Calculate token savings if I convert this JSON to TONL:
-[{"id": 1, "name": "Test"}]
-```
+The stdio MCP server:
+- ✅ Runs locally on your machine
+- ✅ No network ports opened
+- ✅ No authentication needed (local process)
+- ✅ Communicates via stdin/stdout only
 
-## Troubleshooting
+### No Token Required
 
-### Server Not Starting
+Unlike the HTTP server, stdio mode doesn't need authentication tokens because:
+- Only Claude Desktop can communicate with it
+- Process isolation provides security
+- No remote access possible
 
-Check Node.js version:
+---
+
+## Remote Server Option
+
+For team collaboration or remote deployments, use the HTTP server instead:
+
+**1. Start HTTP server:**
 ```bash
-node --version
-# Should be 18.0.0 or higher
+export TONL_AUTH_TOKEN=$(openssl rand -hex 32)
+npx tonl-mcp-server
 ```
 
-### Connection Failed
-
-Verify server is running:
-```bash
-curl -H "Authorization: Bearer your-token" \
-  http://localhost:3000/mcp
+**2. Configure Claude Desktop:**
+```json
+{
+  "mcpServers": {
+    "tonl": {
+      "url": "http://your-server:3000/mcp",
+      "transport": {
+        "type": "sse"
+      },
+      "headers": {
+        "Authorization": "Bearer your-token-here"
+      }
+    }
+  }
+}
 ```
 
-Should return SSE event.
+See [MCP Server Guide](/guide/mcp-server) for HTTP deployment.
 
-### Tools Not Appearing
+---
 
-1. Verify config.json syntax (valid JSON)
-2. Restart Claude Desktop completely
-3. Check server logs for errors
+## Token Savings Examples
 
-### Authentication Failed
+### Small Dataset (5 records)
 
-Test token:
-```bash
-# Should fail (401)
-curl http://localhost:3000/mcp
+**JSON:** 118 tokens  
+**TONL:** 75 tokens  
+**Savings:** 36%
 
-# Should work
-curl -H "Authorization: Bearer your-token" \
-  http://localhost:3000/mcp
-```
+### Medium Dataset (100 records)
 
-## Production Setup
+**JSON:** 2,470 tokens  
+**TONL:** 987 tokens  
+**Savings:** 60%
 
-For production deployment:
+### Large Dataset (1000 records)
 
-1. **Run as Service** - Use systemd/launchd
-2. **Use Docker** - `docker run -d ghcr.io/kryptomrx/tonl-mcp-bridge`
-3. **Add HTTPS** - Use nginx reverse proxy
-4. **Rotate Tokens** - Change tokens regularly
+**JSON:** 24,700 tokens  
+**TONL:** 9,870 tokens  
+**Savings:** 60%
 
-See [Full Guide](../guide/claude-desktop.md) for details.
+💡 **Savings increase with dataset size**
+
+---
 
 ## Next Steps
 
-- [Full Claude Desktop Guide](../guide/claude-desktop.md) - Complete setup
-- [MCP Server Guide](../guide/mcp-server.md) - Server configuration
-- [Docker Deployment](../guide/docker.md) - Container setup
-- [Production Deployment](../guide/deployment.md) - Production best practices
+**Learn More:**
+- [MCP Server Guide](/guide/mcp-server) - HTTP server setup
+- [TONL Format](/guide/tonl-format) - Format specification
+- [Token Savings](/guide/token-savings) - Optimization details
 
-## Example Output
+**Integration:**
+- [Vector Databases](/guide/milvus) - RAG systems
+- [Streaming](/guide/streaming) - Real-time processing
+- [Privacy](/guide/privacy) - Data anonymization
 
-When you ask Claude to convert data:
+**Deploy:**
+- [Docker](/guide/docker) - Container deployment
+- [Kubernetes](/guide/kubernetes) - Production scaling
 
-**Your Input:**
-```
-Convert to TONL: [{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}]
-```
+---
 
-**Claude's Response:**
-```
-users[2]{id:i32,name:str}:
-  1, Alice
-  2, Bob
+## Support
 
-This TONL format saves approximately 33% tokens compared to JSON.
-```
+**Issues:**
+- GitHub: [Issues](https://github.com/kryptomrx/tonl-mcp-bridge/issues)
+- Discussions: [GitHub Discussions](https://github.com/kryptomrx/tonl-mcp-bridge/discussions)
 
-## Common Use Cases
+**Documentation:**
+- Full Docs: [Documentation Site](https://tonl-mcp-bridge-docs.vercel.app/)
+- Examples: [Example Repository](https://github.com/kryptomrx/tonl-mcp-bridge/tree/main/examples)
 
-### 1. Database Results
+---
 
-```
-I have this database result, convert to TONL:
-[
-  {"order_id": 1001, "customer": "Alice", "total": 99.99},
-  {"order_id": 1002, "customer": "Bob", "total": 149.50}
-]
-```
+## Success! 🎉
 
-### 2. API Responses
+You can now use TONL directly in Claude Desktop:
+- ✅ Automatic JSON ↔ TONL conversion
+- ✅ 40-60% token savings
+- ✅ Real-time calculations
+- ✅ Zero configuration needed
 
-```
-Convert this API response to TONL to save tokens:
-[
-  {"status": "success", "code": 200, "message": "OK"},
-  {"status": "error", "code": 404, "message": "Not Found"}
-]
-```
-
-### 3. Batch Data
-
-```
-I need to send this batch data to an LLM, optimize it:
-[
-  {"sensor": "temp", "value": 22.5, "unit": "C"},
-  {"sensor": "humidity", "value": 65, "unit": "%"}
-]
-```
-
-## Tips
-
-**Token Savings:**
-- More rows = higher savings
-- Consistent schema = better compression
-- Aim for 10+ rows for best results
-
-**Performance:**
-- Server handles 50MB payloads
-- Fast conversions (<100ms)
-- Supports concurrent requests
-
-**Security:**
-- Always use tokens in production
-- Rotate tokens monthly
-- Never commit tokens to git
-
-## Success!
-
-You now have TONL integration working with Claude Desktop! 🎉
-
-The server will:
-- Convert JSON ↔ TONL automatically
-- Calculate token savings
-- Handle authentication
-- Run reliably
-
-**Keep the server running** while using Claude Desktop.
+**Just ask Claude to convert your data!**
