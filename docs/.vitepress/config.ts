@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress';
 
 export default defineConfig({
   title: 'TONL-MCP Bridge',
-  description: 'Database adapters and tooling for TONL format',
+  description: 'Production-grade token optimization with streaming, privacy, and real-time monitoring',
   
   ignoreDeadLinks: true,
 
@@ -34,12 +34,21 @@ export default defineConfig({
           ]
         },
         {
+          text: 'v1.0.0 Features',
+          items: [
+            { text: 'Streaming Pipeline', link: '/guide/streaming' },
+            { text: 'Privacy & Compliance', link: '/guide/privacy' },
+            { text: 'Live Monitoring', link: '/guide/live-monitoring' },
+            { text: 'Health Checks', link: '/guide/health-checks' }
+          ]
+        },
+        {
           text: 'CLI & Analytics',
           items: [
             { text: 'CLI Reference', link: '/guide/cli-reference' },
+            { text: 'Commands Reference', link: '/guide/commands' },
             { text: 'ROI Calculator', link: '/guide/roi-calculator' },
             { text: 'Visual Dashboard', link: '/guide/visual-dashboard' },
-            { text: 'Live MCP Monitoring', link: '/guide/live-monitoring' },
             { text: 'Keyboard Shortcuts', link: '/guide/keyboard-shortcuts' },
             { text: 'Responsive Layouts', link: '/guide/responsive-layouts' },
             { text: 'Output Formats', link: '/guide/output-formats' },
@@ -49,11 +58,12 @@ export default defineConfig({
         {
           text: 'Production Features',
           items: [
-            { text: 'Claude Desktop Integration', link: '/guide/claude-desktop' },
             { text: 'MCP Server', link: '/guide/mcp-server' },
+            { text: 'Claude Desktop Integration', link: '/guide/claude-desktop' },
             { text: 'Docker Deployment', link: '/guide/docker' },
+            { text: 'Kubernetes Deployment', link: '/guide/kubernetes' },
             { text: 'Production Deployment', link: '/guide/deployment' },
-            { text: 'Privacy & Compliance', link: '/guide/privacy' }
+            { text: 'Security', link: '/guide/security' }
           ]
         },
         {
@@ -71,7 +81,8 @@ export default defineConfig({
             { text: 'Pinecone', link: '/guide/pinecone' },
             { text: 'Weaviate', link: '/guide/weaviate' },
             { text: 'Qdrant', link: '/guide/qdrant' },
-            { text: 'Milvus', link: '/guide/milvus' }
+            { text: 'Milvus', link: '/guide/milvus' },
+            { text: 'ChromaDB', link: '/guide/chromadb' }
           ]
         },
         {
@@ -88,6 +99,8 @@ export default defineConfig({
           text: 'API Reference',
           items: [
             { text: 'Core Functions', link: '/api/core' },
+            { text: 'Streaming API', link: '/api/streaming' },
+            { text: 'Privacy API', link: '/api/privacy' },
             { text: 'SQL Adapters', link: '/api/sql' },
             { text: 'Vector Adapters', link: '/api/vector' },
             { text: 'MCP Server', link: '/api/server' },
@@ -101,6 +114,8 @@ export default defineConfig({
           items: [
             { text: 'SQLite', link: '/examples/sqlite' },
             { text: 'PostgreSQL', link: '/examples/postgres' },
+            { text: 'Streaming Logs', link: '/examples/streaming' },
+            { text: 'Privacy Masking', link: '/examples/privacy' },
             { text: 'Batch Queries', link: '/examples/batch' },
             { text: 'RAG with Qdrant', link: '/examples/qdrant' },
             { text: 'RAG with Milvus', link: '/examples/milvus' },
@@ -115,7 +130,7 @@ export default defineConfig({
     ],
 
     footer: {
-      message: 'MIT Licensed',
+      message: 'MIT Licensed | v1.0.0',
       copyright: 'Copyright © 2025 kryptomrx'
     }
   }

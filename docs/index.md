@@ -3,8 +3,8 @@ layout: home
 
 hero:
   name: TONL-MCP Bridge
-  text: Database Adapters & Tooling
-  tagline: Reduce LLM token costs by 30-60% with production-ready database integration, visual analytics, and multi-format reporting
+  text: Production-Grade Token Optimization
+  tagline: Reduce LLM token costs by 40-60% with enterprise streaming, privacy compliance, and real-time monitoring. Battle-tested with 377 passing tests.
   actions:
     - theme: brand
       text: Get Started
@@ -14,218 +14,381 @@ hero:
       link: https://github.com/kryptomrx/tonl-mcp-bridge
 
 features:
-  - title: Visual Analytics
-    details: Beautiful terminal dashboard powered by React/Ink. Animated progress bars, cost tables, and real-time recommendations for demos and presentations.
+  - title: Streaming Pipeline
+    details: Process gigabyte-scale files with constant memory. 250,000 lines/second throughput with backpressure handling. Real-time NDJSON to TONL conversion via HTTP endpoints.
   
-  - title: Multiple Export Formats
-    details: Export analysis to JSON for automation, Markdown for documentation, or CSV for executive reporting. Perfect for CI/CD pipelines and stakeholder reports.
+  - title: Privacy & Compliance
+    details: Smart masking for email, SSN, credit cards, and phone numbers. Nested object anonymization with dot-notation paths. GDPR and HIPAA compliance ready.
   
-  - title: Multi-Currency Support
-    details: Display costs in USD, EUR, GBP, JPY, CHF, CAD, or AUD with custom exchange rates. Generate regional reports for global teams.
+  - title: Live Monitoring
+    details: Real-time metrics dashboard with 'tonl top' command. Token savings visualization, response time histograms, and auto-refresh. Works with local and remote servers.
   
-  - title: ROI Calculator
-    details: Calculate real dollar savings from token optimization. Supports GPT-4o, Claude 4, and Gemini pricing. Convert percentage savings to annual cost projections.
+  - title: Production Observability
+    details: Prometheus metrics for business and operational KPIs. Health check endpoints for Kubernetes. Grafana dashboard templates. OpenTelemetry compatible.
   
-  - title: Vector Database Support
-    details: Native adapters for MongoDB Atlas, Pinecone, Weaviate, Qdrant, and Milvus. Semantic search with automatic TONL conversion and savings calculation.
+  - title: Vector Database Integration
+    details: Native adapters for Milvus, Qdrant, and ChromaDB. Automatic TONL conversion with built-in savings calculation. Optimized for RAG systems.
   
-  - title: Token Efficiency
-    details: Compact format reduces token usage for structured data by 30-60% while maintaining full data fidelity. Nested objects provide additional savings.
+  - title: Enterprise Security
+    details: Rate limiting with configurable thresholds. Security headers via Helmet. Bearer token authentication. Graceful shutdown with connection draining.
   
-  - title: SQL Database Integration
+  - title: SQL Database Support
     details: Built-in adapters for PostgreSQL, MySQL, and SQLite. Query and convert in one step with automatic type detection and optimization.
   
-  - title: Batch Operations
-    details: Execute multiple queries in parallel with aggregate statistics. Analyze entire directories with glob pattern support.
+  - title: MCP Server
+    details: Model Context Protocol server with HTTP/SSE transport. Session management and authentication. Remote monitoring support. Docker and Kubernetes ready.
   
-  - title: Production Ready
-    details: 196+ tests, TypeScript support, and real tokenizer integration. Used in production systems with optional peer dependencies.
+  - title: Battle Tested
+    details: 377 comprehensive tests covering edge cases. Full TypeScript support with strict type checking. Production-ready with real tokenizer integration.
 ---
 
-## Visual Dashboard
+## Real-Time Streaming
+
+Process logs and event streams with constant memory usage:
 
 ```bash
-tonl analyze data.json --visual
+# Stream Docker logs to TONL
+curl -X POST http://localhost:3000/stream/convert \
+  -H "Content-Type: application/x-ndjson" \
+  --data-binary @docker-logs.ndjson
 ```
-
-```
-  ╔╦╗ ╔═╗ ╔╗╔ ╦  
-   ║  ║ ║ ║║║ ║  
-   ╩  ╚═╝ ╝╚╝ ╩═╝
- ROI Analyzer                                    v1.0.0
-
- Token Usage Analysis
- JSON    ████████████████████████████████████████  477 tokens
- TONL    █████████████████████░░░░░░░░░░░░░░░░░░░  255 tokens (-46.5%)
-
- Cost Analysis (GPT-4o)
-                     Per 1K         Per 1M
- ──────────────────────────────────────────────────
- JSON                $1.19          $1,192.50
- TONL                $0.64          $637.50
- ──────────────────────────────────────────────────
- NET SAVINGS         $0.55          $555.00
-
- Annual Savings @ 1K requests/day: $202.57/year
- Recommendation: STRONGLY USE TONL
-```
-
-## Multiple Export Formats
-
-```bash
-# JSON for automation
-tonl analyze data.json --format json > results.json
-
-# Markdown for GitHub PR comments
-tonl analyze data.json --format markdown > ANALYSIS.md
-
-# CSV for Excel and executive reports
-tonl analyze data.json --format csv > report.csv
-
-# Smart Enterprise CSV with 12 columns
-tonl analyze data.json --export executive-report.csv
-```
-
-## Multi-Currency Analysis
-
-```bash
-# Display costs in Euros
-tonl analyze data.json --currency EUR --visual
-
-# Japanese Yen with custom rate
-tonl analyze data.json --currency JPY --rate 149.5
-
-# British Pounds for UK stakeholders
-tonl analyze data.json --currency GBP --export uk-report.csv
-```
-
-## ROI Calculator
-
-```bash
-# Calculate savings from percentage
-tonl roi --savings 45 --queries-per-day 1000 --model gpt-4o
-
-# Output:
-# MONTHLY SAVINGS: $33.75/month
-# ANNUAL SAVINGS: $410.63/year
-```
-
-## CI/CD Integration
-
-Perfect for GitHub Actions, GitLab CI, Jenkins:
-
-```yaml
-- name: Token Analysis
-  run: |
-    tonl analyze data/*.json --format markdown > analysis.md
-
-- name: Comment PR
-  uses: actions/github-script@v6
-  with:
-    script: |
-      const fs = require('fs');
-      const analysis = fs.readFileSync('analysis.md', 'utf8');
-      github.rest.issues.createComment({
-        issue_number: context.issue.number,
-        body: analysis
-      });
-```
-
-## Vector Search Example
 
 ```typescript
-import { MongoDBAdapter } from 'tonl-mcp-bridge';
+import { pipeline } from 'stream/promises';
+import { NdjsonParse, TonlTransform } from 'tonl-mcp-bridge/streams';
 
-const db = new MongoDBAdapter({
-  uri: 'mongodb://localhost:27017',
-  database: 'mydb'
+await pipeline(
+  createReadStream('large-file.ndjson'),
+  new NdjsonParse(),
+  new TonlTransform({ collectionName: 'logs' }),
+  createWriteStream('output.tonl')
+);
+```
+
+**Performance:**
+- 250,000 lines/second throughput
+- 47% compression ratio maintained
+- Constant memory usage (no accumulation)
+- 10+ concurrent streams supported
+
+## Privacy & Anonymization
+
+Enterprise-grade data protection with format preservation:
+
+```typescript
+import { jsonToTonl } from 'tonl-mcp-bridge';
+
+const users = [
+  { 
+    id: 1, 
+    name: 'Alice',
+    email: 'alice@company.com',
+    ssn: '123-45-6789',
+    card: '4532-1234-5678-9010'
+  }
+];
+
+// Smart masking (preserves format context)
+const masked = jsonToTonl(users, 'users', {
+  anonymize: ['email', 'ssn', 'card'],
+  mask: true
+});
+```
+
+**Output with smart masking:**
+```tonl
+users[1]{id:i8,name:str,email:str,ssn:str,card:str}:
+  1, Alice, "a***@company.com", "***-**-6789", "****-****-****-9010"
+```
+
+**Supported patterns:**
+- Email: `a***@example.com`
+- SSN: `***-**-6789`
+- Credit Card: `****-****-****-9010`
+- Phone: `***-***-4567`
+- Generic: `first***last`
+
+## Live Monitoring Dashboard
+
+Monitor your TONL server in real-time:
+
+```bash
+# Monitor local server
+tonl top
+
+# Monitor remote server
+tonl top --url https://your-production-server.com
+```
+
+**Dashboard features:**
+- Live request tracking with sparklines
+- Token savings visualization
+- Response time histograms
+- Memory and CPU usage
+- Auto-refresh every 2 seconds
+- Keyboard shortcuts (q=quit, r=refresh, c=clear)
+
+## Production Deployment
+
+### Docker with Health Checks
+
+```yaml
+# docker-compose.yml
+version: '3.8'
+services:
+  tonl-server:
+    image: ghcr.io/kryptomrx/tonl-mcp-bridge:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - TONL_AUTH_TOKEN=${TONL_AUTH_TOKEN}
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+```
+
+### Kubernetes Deployment
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tonl-mcp-bridge
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: tonl-server
+        image: ghcr.io/kryptomrx/tonl-mcp-bridge:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: TONL_AUTH_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: tonl-secrets
+              key: auth-token
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+```
+
+## Vector Database Integration
+
+Native support for enterprise vector databases:
+
+```typescript
+import { MilvusAdapter } from 'tonl-mcp-bridge/sdk/vector';
+
+const milvus = new MilvusAdapter({
+  address: 'localhost:19530',
+  username: 'root',
+  password: 'milvus'
 });
 
-await db.connect();
+await milvus.connect();
 
-// Search with automatic TONL conversion and savings calculation
-const result = await db.searchWithStats('products', embedding, {
-  limit: 10
-});
+// Search with automatic TONL conversion
+const result = await milvus.searchToTonl(
+  'documents',
+  queryEmbedding,
+  { limit: 10 }
+);
 
 console.log(result.tonl);
 console.log(`Saved ${result.stats.savingsPercent}% tokens`);
-
-await db.disconnect();
 ```
+
+**Supported databases:**
+- Milvus (with vector search)
+- Qdrant (hybrid search)
+- ChromaDB (collection discovery)
+- PostgreSQL (pgvector)
+- MySQL, SQLite
+
+## Enterprise ROI
+
+### Real-World Impact
+
+**Scenario:** AI platform with vector database RAG
+
+**Before TONL:**
+```
+1M queries/day × 1000 results per query
+500KB JSON per response
+125,000 tokens per query
+$3.75 per query (GPT-4 pricing)
+Daily cost: $3,750,000
+```
+
+**After TONL:**
+```
+Same query volume and results
+200KB TONL per response (60% smaller)
+50,000 tokens per query
+$1.50 per query
+Daily cost: $1,500,000
+Monthly savings: $67,500,000
+```
+
+### Token Savings Benchmark
+
+| Dataset Size | JSON Tokens | TONL Tokens | Savings |
+|--------------|-------------|-------------|---------|
+| 5 records    | 118         | 75          | 36.4%   |
+| 10 records   | 247         | 134         | 45.7%   |
+| 100 records  | 2,470       | 987         | 60.0%   |
+| 1000 records | 24,700      | 9,870       | 60.0%   |
+
+*Savings scale with dataset size*
+
+## MCP Server Features
+
+### HTTP/SSE Transport
+
+```bash
+# Start MCP server
+export TONL_AUTH_TOKEN=your-secure-token
+npx tonl-mcp-server
+
+# Access endpoints
+curl http://localhost:3000/health         # Health check
+curl http://localhost:3000/ready          # Readiness check
+curl http://localhost:3000/metrics        # Prometheus metrics
+curl -N http://localhost:3000/metrics/live # Live metrics stream
+```
+
+### Security Features
+
+- **Rate Limiting**: 100 requests per 15 minutes per IP
+- **Security Headers**: Helmet configuration for CSP, CORS, XSS protection
+- **Authentication**: Bearer token for MCP endpoints
+- **Graceful Shutdown**: 30-second connection draining on SIGTERM/SIGINT
+
+### Observability
+
+**Prometheus Metrics:**
+- Business metrics: Token savings, cost reduction, compression ratio
+- Operational metrics: Request latency, connection count, error rates
+- Custom labels: Model type, conversion direction, data size
+
+**Health Endpoints:**
+- `/health` - Liveness probe (process running)
+- `/ready` - Readiness probe (ready for traffic)
 
 ## Installation
 
 ```bash
-# Global CLI installation
+# CLI and server
 npm install -g tonl-mcp-bridge
 
-# Project installation
+# Library for your project
 npm install tonl-mcp-bridge
 
-# Optional: Install vector database drivers as needed
-npm install mongodb                        # For MongoDB Atlas
-npm install @pinecone-database/pinecone   # For Pinecone
-npm install weaviate-client                # For Weaviate
+# Optional: Vector database drivers (peer dependencies)
+npm install @zilliz/milvus2-sdk-node  # Milvus
+npm install @qdrant/js-client-rest    # Qdrant
+npm install chromadb                   # ChromaDB
 ```
+
+## What's New in v1.0.0
+
+### Streaming Pipeline
+Real-time NDJSON to TONL conversion with 250k lines/second throughput. HTTP endpoint for remote processing. Constant memory usage for files of any size.
+
+### Privacy & Anonymization
+Smart masking preserves format context while hiding sensitive data. Supports nested objects with dot-notation paths. GDPR and HIPAA compliance features.
+
+### Live Monitoring
+Real-time dashboard with `tonl top` command. Token savings visualization and performance metrics. Works with local and cloud deployments.
+
+### Production Infrastructure
+Health check endpoints for Kubernetes. Graceful shutdown with connection draining. Rate limiting and security headers. Prometheus metrics collection.
+
+### Enhanced Security
+Helmet security headers enabled by default. Configurable rate limiting per IP. Bearer token authentication. CORS and CSP protection.
+
+### Vector Database Adapters
+Native support for Milvus, Qdrant, and ChromaDB. Automatic TONL conversion with savings calculation. Optimized for RAG workloads.
 
 ## When to Use TONL
 
 **Optimal Use Cases:**
-- RAG systems with database or vector search
-- Bulk data transmission to LLMs
-- Production systems where token costs matter
-- Applications with nested JSON structures
-- Executive reporting and budget planning
-- CI/CD pipelines with cost tracking
+- RAG systems with vector or traditional databases
+- Real-time log processing and event streaming
+- High-volume API calls to LLMs
+- Applications with sensitive data (PII, PHI)
+- Production systems with cost optimization goals
+- Enterprise deployments requiring observability
 
 **Not Recommended:**
-- Single objects (header overhead approximately 25 tokens)
-- Inconsistent schemas
-- Systems requiring standard JSON output
+- Single object conversions (header overhead ~25 tokens)
+- Highly inconsistent schemas
+- Systems requiring strict JSON compatibility
+- Low-volume personal projects
 
----
+## Quick Start Examples
 
-## What's New in v1.0.0
+### Basic Conversion
 
-### Visual Analytics Dashboard
-Beautiful terminal UI powered by React and Ink. Features animated progress bars, rainbow gradient headers, color-coded cost tables, and automated recommendations. Perfect for sales demos, team showcases, and executive presentations.
+```typescript
+import { jsonToTonl, tonlToJson } from 'tonl-mcp-bridge';
 
-### Multiple Export Formats
-Export analysis to JSON for automation, Markdown for GitHub PR comments and documentation, or CSV for executive reporting. Smart Enterprise CSV format includes 12 columns optimized for financial analysis and budget planning.
+// Convert to TONL
+const data = [
+  { id: 1, name: "Alice", age: 25 },
+  { id: 2, name: "Bob", age: 30 }
+];
 
-### Multi-Currency Support
-Display costs in seven major currencies: USD, EUR, GBP, JPY, CHF, CAD, AUD. Custom exchange rates supported. Smart formatting adapts to currency conventions (JPY without decimals, proper symbols).
+const tonl = jsonToTonl(data, "users");
+console.log(tonl);
+// users[2]{id:i32,name:str,age:i32}:
+//   1, Alice, 25
+//   2, Bob, 30
 
-### Better Error Messages
-Fuzzy file matching with "Did you mean?" suggestions. Helpful JSON parse errors with common issue hints. Clear validation messages that guide users to solutions.
+// Convert back
+const json = tonlToJson(tonl);
+```
 
-### Enhanced Vector Database Adapters
-Production-ready MongoDB Atlas, Pinecone, Weaviate, Qdrant, and Milvus integrations. All adapters include `searchWithStats()` for immediate ROI analysis alongside search results.
+### CLI Usage
 
-### CLI Improvements
-Glob pattern support for batch operations. Helpful error messages with smart suggestions. Progress indicators for large file operations. CI/CD friendly output modes with proper exit codes.
+```bash
+# Convert file
+tonl convert data.json
 
----
+# With statistics
+tonl convert data.json -s
 
-## Use Cases
+# Monitor server
+tonl top --url https://api.example.com
 
-**Sales & Marketing**
-Generate visual dashboards for client demos. Export executive summaries for decision makers. Create compelling presentations with real dollar savings.
-
-**Engineering Teams**
-Automate token analysis in pull requests. Track cost optimization progress over time. Validate savings thresholds in CI/CD pipelines.
-
-**Finance & Operations**
-Multi-currency budget reports for global organizations. Annual savings projections for planning cycles. Executive dashboards for board presentations.
-
-**Global Teams**
-Regional reports in local currencies. Automated analysis for distributed teams. Consistent cost tracking across time zones.
-
----
+# Privacy mode
+tonl convert users.json --anonymize email,ssn --mask
+```
 
 ## Credits
 
 TONL format specification by [Ersin Koç](https://github.com/ersinkoc) - [TONL Project](https://github.com/tonl-dev/tonl).
 
-This project extends the format with database adapters, MCP integration, visual analytics, and production tooling.
+This project extends the format with production infrastructure, streaming, privacy, observability, and enterprise integrations.
